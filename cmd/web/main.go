@@ -1,10 +1,13 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"log"
 	"net/http"
 	"os"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type application struct {
@@ -15,10 +18,18 @@ type application struct {
 func main() {
 
 	addr := flag.String("addr", ":8080", "Http network address")
+	dsn := flag.String("dsn", "web:password123@/snippetbox?parseTime=true", "MySql Database")
 	flag.Parse()
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+
+	db, err := openDB(*dsn)
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+
+	defer db.Close()
 
 	app := &application{
 		errorLog: errorLog,
@@ -33,6 +44,17 @@ func main() {
 
 	infoLog.Printf("Starting server on %s", *addr)
 	errorLog.Fatal(server.ListenAndServe())
+}
+
+func openDB(dsn string) (*sql.DB, error) {
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return nil, err
+	}
+	if err = db.Ping(); err != nil {
+		return nil, err
+	}
+	return db, err
 }
 
 func (app *application) routes() *http.ServeMux {
