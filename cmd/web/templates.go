@@ -3,15 +3,21 @@ package main
 import (
 	"html/template"
 	"path/filepath"
+	"time"
 
 	"github.com/willsu88/snippet-box/pkg/models"
 )
 
+var functions = template.FuncMap{
+	"humanDate": humanDate,
+}
+
 // Struct to hold the dynamic data
 // that we pass to the HTML template
 type templateData struct {
-	Snippet  *models.Snippet
-	Snippets []*models.Snippet
+	CurrentYear int
+	Snippet     *models.Snippet
+	Snippets    []*models.Snippet
 }
 
 func newTemplateCache(dir string) (map[string]*template.Template, error) {
@@ -31,7 +37,7 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 		name := filepath.Base(page)
 
 		// Parse the page template file in to a template set.
-		ts, err := template.ParseFiles(page)
+		ts, err := template.New(name).Funcs(functions).ParseFiles(page)
 		if err != nil {
 			return nil, err
 		}
@@ -55,4 +61,10 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 	}
 	// Return the map.
 	return cache, nil
+}
+
+// Create a humanDate function which returns a nicely formatted string
+// representation of a time.Time object.
+func humanDate(t time.Time) string {
+	return t.Format("02 Jan 2006 at 15:04")
 }
