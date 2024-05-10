@@ -53,6 +53,8 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
+		app.errorLog.Printf("%s - %s %s", r.RemoteAddr, r.Proto, r.Method)
+		return
 	}
 
 	form := forms.New(r.PostForm)
@@ -62,6 +64,8 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 
 	if !form.Valid() {
 		app.render(w, r, "create.page.tmpl", &templateData{Form: form})
+		app.errorLog.Printf("%s - %s %s", r.RemoteAddr, r.Proto, r.Method)
+		return
 	}
 
 	id, err := app.snippets.Insert(form.Get("title"), form.Get("content"), form.Get("expires"))
