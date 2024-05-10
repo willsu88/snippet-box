@@ -38,5 +38,30 @@ so that these functions have direct access to this application struct and thus a
 
 **Note:** This was the first time I've used this type of function declaration. In my mind, I imagine this to be Go's way of doing OOP-like functionalities. However, instead of declaring classes and the methods in the same file, I can now have the functionalities spread across different files as needed.
 
+### Middleware Pattern
+I like to think of the Middleware Pattern to be synonymous to the famous **Chain of Responsibility Pattern**. The Go web application is just a chain of `ServeHTTP()` methods that are called one after another. There are quite a few routes that my mux helps set up to handle different requests. But what's common among all of these requests is that I need a way to
+1. handle panic recovery for the goroutine serving the HTTP request
+2. log HTTP requests as they come in
+3. handle some secure headers
+
+It would not make sense to copy this code across each of the different routes and their respective functions. Instead, I can chain them together like so:
+```
+panicRecovery -> logRequests -> secureHeaders -> serveMux -> handler functions
+```
+So that the process of panic recovery, logs, secure headers are always handled. For this, I used a third party library `github.com/justinas/alice` to help me chain them together.
+Eg
+```
+	standardMiddleware := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
+	mux := pat.New()
+	mux.Get("/", http.HandlerFunc(app.home))
+	...
+	return standardMiddleware.Then(mux)
+```
+
+Note: Another important detail I learned is the keyword `defer`. I have used this to handle defering the closing of a DB conenction. But in this particular instance, I used it to defer the `recover()` method. I thought this was a pretty neat feature of Go-lang. In that, in an event of a panic, as Go unwinds the stack, it'll eventually hit this recover function and handles the necessary tasks as I imposed.
+
+
+
+
 
 
