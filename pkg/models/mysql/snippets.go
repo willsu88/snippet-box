@@ -35,10 +35,7 @@ func (m *SnippetModel) Get(id int) (*models.Snippet, error) {
 
 	row := m.DB.QueryRow(stmt, id)
 
-	// Initialize a pointer to a new Snippet struct
 	s := &models.Snippet{}
-
-	// Scan the data into the struct
 	err := row.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
 	if err == sql.ErrNoRows {
 		return nil, models.ErrNoRecord

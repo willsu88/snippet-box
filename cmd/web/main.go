@@ -40,15 +40,13 @@ func main() {
 
 	defer db.Close()
 
-	// Initialize a new template cache...
 	templateCache, err := newTemplateCache("./ui/html/")
 	if err != nil {
 		errorLog.Fatal(err)
 	}
 
 	session := sessions.New([]byte(*secret))
-	session.Lifetime = 12 * time.Hour //expires after 12 hours
-
+	session.Lifetime = 12 * time.Hour
 	app := &application{
 		errorLog:      errorLog,
 		infoLog:       infoLog,
