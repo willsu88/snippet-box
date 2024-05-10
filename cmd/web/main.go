@@ -64,7 +64,7 @@ func main() {
 	}
 
 	infoLog.Printf("Starting server on %s", *addr)
-	errorLog.Fatal(server.ListenAndServe())
+	errorLog.Fatal(server.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem"))
 }
 
 func openDB(dsn string) (*sql.DB, error) {
