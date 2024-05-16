@@ -7,7 +7,7 @@ issues persisted in that project that I wasn't sure how to tackle in the Go way.
 ## Learnings
 In this new project, taken inspiration and learnings from the the book [Let's Go](https://lets-go.alexedwards.net/) by Alex Edwards, I've implemented  quite a few useful patterns to structure my Go code to be as idiomatic and clean as possible. Below are some key insights.
 
-### Separations of Concern
+### Separation of Concerns
 Separating the code into 3 main categories: `main.go`, `handlers.go`, and `/models/*.go`. This is similar to the famous MVC pattern I've used in Java/Spring.  
 
 1. Controller: **main.go** handles all the initialiaztion -> connecting to the DB, routing paths to handler functions, and keeps track of any "global" states.
@@ -79,6 +79,6 @@ app.session.PopString(r, "flash")
 
 **Tradeoff:** I understand the need for session managers for other cases. However, for this particular use case, I wonder if it's possible to just handle this client side? For, instance upon creation of a succesful user, the client side will receive a 200 Status ok. Using that Status ok, the client code (say React) can just re-render as necessary on their side. Perhaps sessions become more important when the data being passed around has higher security concerns.
 
-
+### User Authentication
 
 
